@@ -20,19 +20,22 @@ class VkRequests:
 		self.sex = 0
 
 	def get_countries(self):
-		"""Получение списка стран"""
 		params = {
 			'access_token': self.vk_token,
 			'need_all': 1,
 			'count': 1000,
 			'v': 5.126
 		}
-		response = requests.get(self.url + 'database.getCountries', params=params)
-		countries = response.json()['response']['items']
-		return countries
+		try:
+			response = requests.get(self.url + 'database.getCountries', params=params)
+			countries = response.json()['response']['items']
+			return countries
+		except ApiError:
+			return 'Нет доступа'
+		except KeyError:
+			return 'Проблема'
 
 	def get_cities(self, country):
-		"""Получение списка  основных городов в заданной стране"""
 		params = {
 			'access_token': self.vk_token,
 			'country_id': country,
@@ -42,10 +45,12 @@ class VkRequests:
 		}
 		try:
 			response = requests.get(self.url + 'database.getCities', params=params)
+			cities = response.json()['response']['items']
+			return cities
+		except ApiError:
+			return 'Нет доступа'
 		except KeyError:
-			return 'Api Off'
-		cities = response.json()['response']['items']
-		return cities
+			return 'Проблема'
 
 	def get_user_info(self, user_id):
 		""" Получаем информацию о пользователе из VK по id """
@@ -55,9 +60,14 @@ class VkRequests:
 			'fields': 'bdate, sex, city, relation',
 			'v': 5.126
 		}
-		response = requests.get(self.url + 'users.get', params=params)
-		user_info = response.json()['response'][0]
-		return user_info
+		try:
+			response = requests.get(self.url + 'users.get', params=params)
+			user_info = response.json()['response'][0]
+			return user_info
+		except ApiError:
+			return 'Нет доступа'
+		except KeyError:
+			return 'Проблема'
 
 	def users_search(self, city, min_age, max_age):
 		""" Поиск подходящих под условия вариантов """
@@ -76,9 +86,14 @@ class VkRequests:
 			'has_photo': 1,
 			'v': 5.126
 		}
-		response = requests.get(self.url + 'users.search', params=params)
-		search_res = response.json()['response']['items']
-		return search_res
+		try:
+			response = requests.get(self.url + 'users.search', params=params)
+			search_res = response.json()['response']['items']
+			return search_res
+		except ApiError:
+			return 'Нет доступа'
+		except KeyError:
+			return 'Проблема'
 
 	def get_photos(self, candidate_id):
 		""" Получаем фотографии по id """
@@ -93,12 +108,12 @@ class VkRequests:
 		}
 		try:
 			response = requests.get(self.url + 'photos.get', params=params)
+			photo_res = response.json()['response']['items']
+			return photo_res
 		except ApiError:
-			return 'Нет доступа к фото'
+			return 'Нет доступа'
 		except KeyError:
-			return 'Проблема с апи'
-		photo_res = response.json()['response']['items']
-		return photo_res
+			return 'Проблема'
 
 	def get_upload_url(self, user_id):
 		""" Получаем ссылку на сервер загрузки файла """
@@ -108,9 +123,14 @@ class VkRequests:
 			'peer_id': user_id,
 			'v': 5.126
 		}
-		response = requests.get(self.url + 'docs.getMessagesUploadServer', params=params)
-		upload_url = response.json()['response']['upload_url']
-		return upload_url
+		try:
+			response = requests.get(self.url + 'docs.getMessagesUploadServer', params=params)
+			upload_url = response.json()['response']['upload_url']
+			return upload_url
+		except ApiError:
+			return 'Нет доступа'
+		except KeyError:
+			return 'Проблема'
 
 	@staticmethod
 	def get_upload_file():

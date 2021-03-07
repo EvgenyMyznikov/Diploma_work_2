@@ -1,3 +1,4 @@
+from vk_classes.vk_processing import VkProcessing
 from Tests.test_config import my_token, vk_id, gp_token, vk_api_url
 import requests
 from random import randrange
@@ -86,8 +87,31 @@ class TestVKRequests:
 		response = requests.get(vk_api_url + 'docs.getMessagesUploadServer', params=params)
 		assert response.status_code == 200
 
-# def test_get_upload_file(self):
-#  assert response.status_code == 200
-#
-# def test_upload_file(self):
-#  assert response.status_code == 200
+
+class TestVkProcessing:
+	vk_proc = VkProcessing()
+
+	def test_process_user_info(self):
+		self.vk_proc.process_user_info({'sex': 1})
+		assert self.vk_proc.sex == 1
+
+	def test_getting_search_list(self):
+		search_res = [{
+			"id": 41609559,
+			"first_name": "Евгений",
+			"last_name": "Мызников",
+		}]
+		search_list = self.vk_proc.getting_search_list(search_res)
+		assert search_list == [('vk.com/id41609559', 'Евгений Мызников')]
+
+	def test_get_photo_list(self):
+		photo_res = self.vk_proc.get_photos(41609559)
+		photos = self.vk_proc.get_photos_list(photo_res)
+		assert photos != []
+
+	def test_get_top_photos(self):
+		vk_proc = VkProcessing()
+		photo_res = vk_proc.get_photos(41609559)
+		photos = vk_proc.get_photos_list(photo_res)
+		top_photos = vk_proc.top_photos(photos)
+		assert top_photos != []
